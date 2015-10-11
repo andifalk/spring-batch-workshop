@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:batch="http://www.springframework.org/schema/batch"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch.xsd">
+	
+	<bean id="jobLauncherImportJob" class="org.springframework.batch.test.JobLauncherTestUtils">
+		<property name="jobRepository" ref="jobRepository"/>
+		<property name="job" ref="importBatchJob"/>
+		<property name="jobLauncher" ref="jobLauncher"/>
+	</bean>
+
+	<bean id="jobLauncherExportJob" class="org.springframework.batch.test.JobLauncherTestUtils">
+		<property name="job" ref="exportBatchJob"/>
+		<property name="jobLauncher" ref="jobLauncher"/>
+		<property name="jobRepository" ref="jobRepository"/>
+	</bean>
+	
+
+</beans>

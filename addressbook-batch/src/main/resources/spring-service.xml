@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+	<bean id="personService" class="info.novatec.addressbook.control.PersonServiceImpl">
+		<property name="personRepository" ref="personRepository"/>
+	</bean>
+
+	<bean id="personManagementService" class="info.novatec.addressbook.boundary.PersonManagementServiceImpl">
+		<property name="personService" ref="personService"/>
+	</bean>
+	
+	<!-- the default tx-manager for annotations is pure DB -->
+    <tx:annotation-driven transaction-manager="jpaTransactionManager"/>
+    
+    <!-- this is the tx-manager used for DB-only access via JPA -->
+    <bean id="jpaTransactionManager" name="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+        <constructor-arg ref="entityManagerFactory"/>
+    </bean>
+</beans>

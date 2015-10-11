@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<bean id="repositoryItemWriter" class="org.springframework.batch.item.data.RepositoryItemWriter" scope="step">
+		<property name="repository" ref="personRepository"/>
+		<property name="methodName" value="save"/>
+	</bean>
+
+	<bean id="repositoryItemReader" class="org.springframework.batch.item.data.RepositoryItemReader" scope="step">
+		<property name="repository" ref="personRepository"/>
+		<property name="methodName" value="findAll"/>
+		<property name="sort">
+			<map>
+				<entry key="lastName">
+					<bean class="org.springframework.data.domain.Sort.Direction" factory-method="valueOf">
+						<constructor-arg value="ASC"/>
+					</bean>
+				</entry>
+			</map>
+		</property>
+	</bean>
+	
+	<bean id="csvExportWriter" 
+		class="org.springframework.batch.item.file.FlatFileItemWriter"
+		scope="step">
+		<property name="resource" value="file:#{jobParameters['csvExportFilePath']}"/>
+		<property name="lineAggregator">
+			<bean class="org.springframework.batch.item.file.transform.DelimitedLineAggregator">
+				<property name="delimiter" value=";"/>
+				<property name="fieldExtractor">
+					<bean class="org.springframework.batch.item.file.transform.BeanWrapperFieldExtractor">
+						<property name="names">
+							<array>
+								<value>firstName</value>
+								<value>lastName</value>
+								<value>birthDate</value>
+							</array>
+						</property>
+					</bean>
+				</property>
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="xmlExportWriter" 
+		class="org.springframework.batch.item.xml.StaxEventItemWriter"
+		scope="step">
+		<property name="resource" value="file:#{jobParameters['xmlExportFilePath']}"/>
+		<property name="marshaller">
+			<bean class="org.springframework.oxm.xstream.XStreamMarshaller">
+				<property name="encoding" value="UTF-8"/>
+			</bean>
+		</property>
+		<property name="rootTagName" value="persons"/>
+	</bean>
+	
+	<bean id="prettyFormatXmlTasklet" class="info.novatec.addressbook.batch.PrettyFormatXmlTasklet" scope="step">
+		<property name="resource" value="file:#{jobParameters['xmlExportFilePath']}"/>
+	</bean>
+
+	<bean id="csvImportReader" 
+		class="org.springframework.batch.item.file.FlatFileItemReader"
+		scope="step">
+		<property name="resource" value="classpath:#{jobParameters['csvImportFilePath']}"/>
+		<property name="lineMapper">
+			<bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
+				<property name="lineTokenizer">
+					<bean class="org.springframework.batch.item.file.transform.DelimitedLineTokenizer">
+						<property name="delimiter" value=";"/>
+					</bean>
+				</property>
+				<property name="fieldSetMapper">
+					<bean class="info.novatec.addressbook.batch.PersonFieldSetMapper"/>
+				</property>
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="importJobParametersValidator"
+		class="org.springframework.batch.core.job.DefaultJobParametersValidator">
+		<property name="requiredKeys">
+			<array>
+				<value>csvImportFilePath</value>
+			</array>
+		</property>
+	</bean>
+
+	<bean id="exportJobParametersValidator"
+		class="org.springframework.batch.core.job.DefaultJobParametersValidator">
+		<property name="requiredKeys">
+			<array>
+				<value>csvExportFilePath</value>
+				<value>xmlExportFilePath</value>
+			</array>
+		</property>
+	</bean>
+	
+	<bean id="loggingItemProcessor" class="info.novatec.addressbook.batch.LoggingItemProcessor"/>
+	
+	<bean id="loggingJobListener" class="info.novatec.addressbook.batch.LoggingJobListener"/>
+	
+	<bean id="loggingStepListener" class="info.novatec.addressbook.batch.LoggingStepListener" scope="step"/>
+	
+	<bean id="loggingSkipListener" class="info.novatec.addressbook.batch.LoggingSkipListener"/>
+
+</beans>

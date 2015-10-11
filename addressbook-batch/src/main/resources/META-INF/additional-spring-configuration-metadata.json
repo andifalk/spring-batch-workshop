@@ -1,0 +1,12 @@
+{"properties": [
+  {
+    "name": "csv.export.path",
+    "type": "java.lang.String",
+    "description": "Export path for csv files"
+  },
+  {
+    "name": "xml.export.path",
+    "type": "java.lang.String",
+    "description": "Export path for xml files"
+  }
+]}

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-16"?>
+<persons>
+    <info.novatec.addressbook.entity.Person>
+        <id class="long">1</id>
+        <firstName>Kai</firstName>
+        <lastName>Hansen</lastName>
+        <birthDate class="sql-date">2015-10-11</birthDate>
+        <addresses class="org.hibernate.collection.internal.PersistentSet">
+            <initialized>false</initialized>
+            <owner class="info.novatec.addressbook.entity.Person" reference="../.."/>
+            <cachedSize>-1</cachedSize>
+            <role>info.novatec.addressbook.entity.Person.addresses</role>
+            <key class="long">1</key>
+            <dirty>false</dirty>
+            <allowLoadOutsideTransaction>false</allowLoadOutsideTransaction>
+        </addresses>
+    </info.novatec.addressbook.entity.Person>
+    <info.novatec.addressbook.entity.Person>
+        <id class="long">2</id>
+        <firstName>Achim</firstName>
+        <lastName>Maier</lastName>
+        <birthDate class="sql-date">2015-10-11</birthDate>
+        <addresses class="org.hibernate.collection.internal.PersistentSet">
+            <initialized>false</initialized>
+            <owner class="info.novatec.addressbook.entity.Person" reference="../.."/>
+            <cachedSize>-1</cachedSize>
+            <role>info.novatec.addressbook.entity.Person.addresses</role>
+            <key class="long">2</key>
+            <dirty>false</dirty>
+            <allowLoadOutsideTransaction>false</allowLoadOutsideTransaction>
+        </addresses>
+    </info.novatec.addressbook.entity.Person>
+</persons>

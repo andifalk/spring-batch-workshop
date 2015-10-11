@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+	
+	<bean id="csvImportReader" 
+		class="org.springframework.batch.item.file.FlatFileItemReader"
+		scope="step">
+		<property name="resource" value="classpath:#{jobParameters['csvImportFilePath']}"/>
+		<property name="lineMapper">
+			<bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
+				<property name="lineTokenizer">
+					<bean class="org.springframework.batch.item.file.transform.DelimitedLineTokenizer">
+						<property name="delimiter" value=";"/>
+					</bean>
+				</property>
+				<property name="fieldSetMapper">
+					<bean class="info.novatec.addressbook.batch.PersonFieldSetMapper"/>
+				</property>
+			</bean>
+		</property>
+	</bean>
+	
+	<bean id="repositoryItemWriter" class="info.novatec.addressbook.jsr352.JSR352ItemWriter" scope="step" autowire="byType">
+		<property name="jsr352Repository" ref="personRepository"/>
+	</bean>
+	
+	<bean id="personRepository" class="info.novatec.addressbook.jsr352.JSR352MapRepository"/>
+		
+	<bean id="loggingItemProcessor" class="info.novatec.addressbook.batch.LoggingItemProcessor"/>
+	
+	<bean id="loggingJobListener" class="info.novatec.addressbook.batch.LoggingJobListener"/>
+	
+	<bean id="loggingStepListener" class="info.novatec.addressbook.batch.LoggingStepListener" scope="step"/>
+	
+	<bean id="loggingSkipListener" class="info.novatec.addressbook.batch.LoggingSkipListener"/>
+	
+</beans>

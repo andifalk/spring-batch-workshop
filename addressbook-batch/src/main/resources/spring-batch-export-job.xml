@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:batch="http://www.springframework.org/schema/batch"
+	xmlns="http://www.springframework.org/schema/beans"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch.xsd">
+
+	<!-- Batch Job for exporting persons to cvs and xml-->	
+	<batch:job id="exportBatchJob">
+		<batch:description>Exports person entities to csv and xml</batch:description>
+		<batch:validator ref="exportJobParametersValidator"/>
+		<batch:listeners>
+			<batch:listener ref="loggingJobListener"/>
+		</batch:listeners>
+		<!-- 
+			Split job into two potentially parallel executing steps for 
+			exporting to csv and xml formats 
+		-->
+		<batch:split id="splitOutputFiles" task-executor="taskExecutor" next="prettyFormatXml">
+			<batch:flow>
+				<batch:step id="xmlExportStep">
+					<batch:tasklet transaction-manager="jpaTransactionManager">
+						<batch:chunk 
+							reader="repositoryItemReader" 
+							processor="loggingItemProcessor" 
+							writer="xmlExportWriter" 
+							commit-interval="10"/>
+					</batch:tasklet>
+					<batch:listeners>
+						<batch:listener ref="loggingStepListener"/>
+					</batch:listeners>
+				</batch:step>
+			</batch:flow>
+			<batch:flow>
+				<batch:step id="csvExportStep">
+					<batch:tasklet transaction-manager="jpaTransactionManager">
+						<batch:chunk 
+							reader="repositoryItemReader" 
+							processor="loggingItemProcessor" 
+							writer="csvExportWriter" 
+							commit-interval="10"/>
+					</batch:tasklet>
+					<batch:listeners>
+						<batch:listener ref="loggingStepListener"/>
+					</batch:listeners>
+				</batch:step>
+			</batch:flow>
+		</batch:split>
+		<batch:step id="prettyFormatXml">
+			<batch:tasklet ref="prettyFormatXmlTasklet"/>
+		</batch:step>
+	</batch:job>
+
+
+</beans>
